@@ -33,5 +33,4 @@ variable "private_subnet_b_cidr" {
 
 variable "cluster_name" {
   type    = string
-  default = "ms-up-running"
 }
