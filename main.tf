@@ -6,12 +6,17 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+locals {
+  cluster_name = "${var.cluster_name}-${var.env_name}"
+}
+
+
 resource "aws_vpc" "main" {
   cidr_block = var.main_vpc_cidr
 
   tags = {
-    "Name"                                      = var.vpc_name,
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared",
+    "Name"                                        = "${var.env_name} ${var.vpc_name}",
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared",
   }
 }
 
@@ -21,9 +26,9 @@ resource "aws_subnet" "public-subnet-a" {
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
-    "Name"                                      = "ms-up-running"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-    "kubernetes.io/role/elb"                    = "1"
+    "Name"                                        = local.cluster_name
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
   }
 }
 
@@ -33,9 +38,9 @@ resource "aws_subnet" "public-subnet-b" {
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    "Name"                                      = "ms-up-running"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-    "kubernetes.io/role/elb"                    = "1"
+    "Name"                                        = local.cluster_name
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
   }
 }
 
@@ -45,9 +50,9 @@ resource "aws_subnet" "private-subnet-a" {
   availability_zone = data.aws_availability_zones.available.names[0]
 
   tags = {
-    "Name"                                      = "ms-up-running"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-    "kubernetes.io/role/internal-elb"           = "1"
+    "Name"                                        = local.cluster_name
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 }
 
@@ -57,9 +62,9 @@ resource "aws_subnet" "private-subnet-b" {
   availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    "Name"                                      = "ms-up-running"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-    "kubernetes.io/role/internal-elb"           = "1"
+    "Name"                                        = local.cluster_name
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 }
 
@@ -67,7 +72,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "ms-up-running"
+    Name = local.cluster_name
   }
 }
 
@@ -80,7 +85,7 @@ resource "aws_route_table" "public-route" {
   }
 
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
@@ -97,14 +102,14 @@ resource "aws_route_table_association" "public-b-association" {
 resource "aws_eip" "nat-a" {
   vpc = true
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
 resource "aws_eip" "nat-b" {
   vpc = true
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
@@ -114,7 +119,7 @@ resource "aws_nat_gateway" "nat-gw-a" {
   depends_on    = [aws_internet_gateway.igw]
 
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
@@ -124,7 +129,7 @@ resource "aws_nat_gateway" "nat-gw-b" {
   depends_on    = [aws_internet_gateway.igw]
 
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
@@ -137,7 +142,7 @@ resource "aws_route_table" "private-route-a" {
   }
 
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
@@ -150,7 +155,7 @@ resource "aws_route_table" "private-route-b" {
   }
 
   tags = {
-    "Name" = "ms-up-running"
+    "Name" = local.cluster_name
   }
 }
 
