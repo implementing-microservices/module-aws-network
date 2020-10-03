@@ -172,7 +172,8 @@ resource "aws_route_table_association" "private-b-association" {
 
 # Create a Route 53 zone for DNS support inside the VPC
 resource "aws_route53_zone" "private-zone" {
-  name = "${local.vpc_name}.msur.com"
+  name = "${var.env_name}.${var.vpc_name}.com"
+  #name = "testing.com"
 
   vpc {
     vpc_id = aws_vpc.main.id
