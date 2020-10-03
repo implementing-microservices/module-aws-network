@@ -32,5 +32,5 @@ variable "private_subnet_b_cidr" {
 }
 
 variable "cluster_name" {
-  type    = string
+  type = string
 }

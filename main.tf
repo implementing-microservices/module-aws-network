@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 locals {
-  vpc_name = "${var.env_name} ${var.vpc_name}"
+  vpc_name     = "${var.env_name} ${var.vpc_name}"
   cluster_name = "${var.cluster_name}-${var.env_name}"
 }
 
@@ -168,4 +168,13 @@ resource "aws_route_table_association" "private-a-association" {
 resource "aws_route_table_association" "private-b-association" {
   subnet_id      = aws_subnet.private-subnet-b.id
   route_table_id = aws_route_table.private-route-b.id
+}
+
+# Create a Route 53 zone for DNS support inside the VPC
+resource "aws_route53_zone" "private-zone" {
+  name = "${local.vpc_name}-private"
+
+  vpc {
+    vpc_id = aws_vpc.main.id
+  }
 }
